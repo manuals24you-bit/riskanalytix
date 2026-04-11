@@ -1,0 +1,163 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(dbgenerated("(gen_random_uuid())::text"))
+  email         String         @unique
+  name          String
+  passwordHash  String
+  role          Role           @default(USER)
+  emailVerified Boolean        @default(false)
+  createdAt     DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  companyName   String?
+  nip           String?
+  regon         String?
+  street        String?
+  city          String?
+  postalCode    String?
+  country       String?        @default("Polska")
+  phone         String?
+  logoUrl       String?
+  auditLogs     AuditLog[]
+  orders        Order[]
+  riskAnalyses  RiskAnalysis[]
+  subscription  Subscription[]
+}
+
+model Subscription {
+  id                   String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId               String
+  stripeSubscriptionId String?  @unique
+  plan                 String
+  status               String
+  startsAt             DateTime @db.Timestamptz(6)
+  expiresAt            DateTime @db.Timestamptz(6)
+  createdAt            DateTime @default(now()) @db.Timestamptz(6)
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Order {
+  id              String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId          String
+  stripePaymentId String?  @unique
+  plan            String
+  amountGross     Int
+  amountNet       Int
+  vatRate         Int
+  paymentMethod   String
+  status          String
+  invoiceCompany  String?
+  invoiceNip      String?
+  invoiceAddress  String?
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+  user            User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model RiskAnalysis {
+  id              String      @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId          String
+  machineName     String
+  machineCategory String
+  serialNo        String?
+  manufacturer    String?
+  productionYear  Int?
+  purpose         String?
+  norm            String?
+  analystName     String?
+  analysisDate    DateTime?   @db.Timestamptz(6)
+  notes           String?
+  clientName      String?
+  clientCompany   String?
+  clientNip       String?
+  clientAddress   String?
+  clientLogo      String?
+  language        String      @default("pl")
+  createdAt       DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+  envLimits       String?
+  foreseenMisuse  String?
+  intendedUse     String?
+  spaceLimits     String?
+  timeLimits      String?
+  machineTypeId   String?
+  riskMethod      String?
+  preparedBy      String?
+  preparedRole    String?
+  approvedBy      String?
+  approvedRole    String?
+  approvedDate    DateTime?   @db.Timestamptz(6)
+  isDraft         Boolean     @default(false)
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  riskEntries     RiskEntry[]
+}
+
+model RiskEntry {
+  id               String       @id @default(dbgenerated("(gen_random_uuid())::text"))
+  analysisId       String
+  element          String
+  threat           String
+  effect           String?
+  severity         Int
+  probability      Int
+  riskScore        Int
+  action           String?
+  sortOrder        Int          @default(0)
+  createdAt        DateTime     @default(now()) @db.Timestamptz(6)
+  scenario         String?
+  reductionLevel   String?
+  residualP        Int?
+  residualR        Int?
+  residualS        Int?
+  avoidance        Int?
+  frequency        Int?
+  riskMethod       String?
+  dcavg            String?
+  mttfd            String?
+  plAchieved       String?
+  plCategory       String?
+  plr              String?
+  plrAuto          String?
+  plrF             String?
+  plrManual        String?
+  plrP             String?
+  plrS             String?
+  justificationP   String?
+  justificationS   String?
+  actionLevel      String?
+  plrJustification String?
+  actionNorm       String?
+  lifecycleStages  String?
+  analysis         RiskAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+}
+
+model AuditLog {
+  id         String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId     String?
+  action     String
+  resource   String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  analysisId String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum Role {
+  USER
+  ADMIN
+}

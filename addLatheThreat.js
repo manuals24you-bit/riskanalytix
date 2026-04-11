@@ -1,0 +1,50 @@
+const fs = require('fs');
+
+const newThreats = `
+      // === TRANSPORT I INSTALACJA ===
+      { id: 'l14', element: 'Transport maszyny (suwnica / w\u00f3zek)', threat: 'Upadek / przewr\u00f3cenie maszyny', effect: 'Zgniecenie os\u00f3b, uszkodzenie maszyny', defaultS: 4, defaultP: 2, actions: ['Plan transportu zatwierdzony przez in\u017cyniera', 'Punkty zaczepienia zgodne z DTR', 'Strefa wy\u0142\u0105czona dla os\u00f3b postronnych', 'Nadz\u00f3r kierownika podczas podnoszenia'] },
+      { id: 'l15', element: 'Instalacja / poziomowanie maszyny', threat: 'Po\u015blizg / przewr\u00f3cenie podczas ustawiania', effect: 'Zgniecenie ko\u0144czyn', defaultS: 4, defaultP: 2, actions: ['Kliny stalowe homologowane', 'Pomiar poziomu (tolerancja 0,02 mm/m)', 'Kotwy fundamentowe wg DTR', 'Min. 2 osoby przy ustawianiu'] },
+      { id: 'l16', element: 'Pod\u0142\u0105czenie elektryczne (400V / 3-faz)', threat: 'Pora\u017cenie pr\u0105dem podczas pod\u0142\u0105czania', effect: 'Oparzenie, \u015bmier\u0107', defaultS: 4, defaultP: 2, actions: ['Pod\u0142\u0105czenie wy\u0142\u0105cznie przez elektryka z uprawnieniami SEP', 'Sprawdzenie kolejno\u015bci faz przed uruchomieniem', 'Protok\u00f3\u0142 odbioru instalacji elektrycznej'] },
+      // === PIERWSZE URUCHOMIENIE ===
+      { id: 'l17', element: 'Pierwsze uruchomienie / rozruch pr\u00f3bny', threat: 'B\u0142\u0105d kierunku obrot\u00f3w wrzeciona', effect: 'Wyrzucenie detalu lub narz\u0119dzia', defaultS: 4, defaultP: 2, actions: ['Sprawdzenie kierunku obrot\u00f3w bez detalu', 'Jazda pr\u00f3bna (dry run) bez narz\u0119dzia', 'Kontrola parametr\u00f3w wg DTR', 'Protok\u00f3\u0142 pierwszego uruchomienia'] },
+      { id: 'l18', element: 'Konfiguracja programu CNC', threat: 'B\u0142\u0105d w programie NC \u2014 kolizja osi', effect: 'Uszkodzenie maszyny, uraz operatora', defaultS: 4, defaultP: 3, actions: ['Symulacja programu przed uruchomieniem', 'Jazda pr\u00f3bna (dry run) z 10% pr\u0119dko\u015bci', 'Weryfikacja offset\u00f3w narz\u0119dziowych', 'Blokada startu \u2014 potwierdzenie operatora'] },
+      // === NORMALNA PRACA ===
+      { id: 'l19', element: 'Uchwyt hydrauliczny / pneumatyczny', threat: 'Utrata ci\u015bnienia \u2014 wypadni\u0119cie detalu', effect: 'Uderzenie wyrzuconym detalem', defaultS: 4, defaultP: 2, actions: ['Czujnik ci\u015bnienia z blokad\u0105 wrzeciona', 'Kontrola szczelno\u015bci uk\u0142adu przed zmian\u0105', 'Alarm przy spadku ci\u015bnienia poni\u017cej progu', 'Procedura: zatrzymanie przy utracie ci\u015bnienia'] },
+      { id: 'l20', element: 'Automatyczna zmiana narz\u0119dzi (rewolwer)', threat: 'Uderzenie g\u0142owic\u0105 rewolwerow\u0105', effect: 'St\u0142uczenia, z\u0142amania ko\u0144czyn', defaultS: 3, defaultP: 3, actions: ['Strefa bezpiecze\u0144stwa podczas zmiany narz\u0119dzi', 'Blokada ruchu rewolweru gdy drzwi otwarte', 'Sygna\u0142 \u015bwietlny i d\u017awi\u0119kowy przed ruchem rewolweru', 'Procedura LOTO przy r\u0119cznej wymianie'] },
+      { id: 'l21', element: 'Praca w trybie serwisowym (JOG / MDI)', threat: 'Niezamierzone uruchomienie osi przy serwisie', effect: 'Zgniecenie ko\u0144czyn operatora / serwisanta', defaultS: 4, defaultP: 3, actions: ['Pr\u0119dko\u015b\u0107 JOG ograniczona do max 2 m/min', 'Wy\u0142\u0105cznik przyzwolenia (enabling device EN ISO 60204-1)', 'Procedura LOTO przy wej\u015bciu w stref\u0119', 'Szkolenie serwisant\u00f3w z procedur bezpiecze\u0144stwa'] },
+      { id: 'l22', element: 'P\u0119kni\u0119cie uchwytu \u2014 utrata detalu', threat: 'Wyrzucenie fragment\u00f3w uchwytu lub detalu przy rozpadzie', effect: 'Ci\u0119\u017ckie urazy \u2014 \u015bmier\u0107', defaultS: 4, defaultP: 1, actions: ['Kontrola momentu dokr\u0119cenia szcz\u0119k (klucz dynamometryczny)', 'Wizualna kontrola uchwytu przed ka\u017cd\u0105 zmian\u0105', 'Wymiana uchwytu wg harmonogramu (max 5000 rbh)', 'Kabina ze szk\u0142em pancernym (klasa B wg EN ISO 23125)'] },
+      { id: 'l23', element: 'Kolizja narz\u0119dzia / suportu z detalem', threat: 'Kolizja suportu z detalem lub uchwytem', effect: 'Uszkodzenie maszyny, odrzut element\u00f3w', defaultS: 3, defaultP: 3, actions: ['Symulacja programu NC przed uruchomieniem', 'Kontrola offset\u00f3w narz\u0119dziowych', 'Czujnik kolizji (opcja)', 'Ograniczenie pr\u0119dko\u015bci przy pierwszym przebiegu'] },
+      { id: 'l24', element: 'Obr\u00f3bka materia\u0142\u00f3w reaktywnych (Mg, Ti)', threat: 'Zap\u0142on py\u0142u magnezowego / tytanowego', effect: 'Po\u017car, wybuch', defaultS: 4, defaultP: 2, actions: ['Ch\u0142odziwo na bazie wody przy obr\u00f3bce Mg', 'Zakaz ch\u0142odziwa olejowego przy Ti i Mg', 'Ga\u015bnica D (na metale) przy maszynie', 'Instrukcja specjalna dla materia\u0142\u00f3w reaktywnych'] },
+      { id: 'l25', element: 'O\u015bwietlenie strefy obr\u00f3bki', threat: 'Niedostateczne o\u015bwietlenie \u2014 b\u0142\u0105d operatora', effect: 'Uraz wynikaj\u0105cy z b\u0142\u0119du obserwacji', defaultS: 2, defaultP: 3, actions: ['Min. 500 lux w strefie obr\u00f3bki (EN 12464-1)', 'Lokalne o\u015bwietlenie LED odporne na wibracje', 'Kontrola o\u015bwietlenia przy ka\u017cdej zmianie'] },
+      // === AWARIE I ZDARZENIA AWARYJNE ===
+      { id: 'l26', element: 'Zanik zasilania / nag\u0142e wy\u0142\u0105czenie', threat: 'Niekontrolowany ruch osi przy powrocie zasilania', effect: 'Kolizja, uraz operatora', defaultS: 4, defaultP: 2, actions: ['Funkcja bezpiecznego zatrzymania przy zaniku zasilania (STO/SS1)', 'Procedura restartu po zaniku zasilania', 'Sprawdzenie pozycji osi przed wznowieniem pracy', 'UPS na sterownik CNC (opcja)'] },
+      { id: 'l27', element: 'Awaria hamulca wrzeciona', threat: 'Wybi\u0119g wrzeciona po wy\u0142\u0105czeniu', effect: 'Kontakt z obracaj\u0105cym si\u0119 uchwytem', defaultS: 4, defaultP: 2, actions: ['Kontrola czasu hamowania wg DTR', 'Blokada dost\u0119pu do momentu pe\u0142nego zatrzymania (czujnik n=0)', 'Regularna kontrola uk\u0142adu hamowania', 'Alarm przy przekroczeniu czasu hamowania'] },
+      { id: 'l28', element: 'Awaria uk\u0142adu ch\u0142odzenia', threat: 'Przegrzanie narz\u0119dzia \u2014 po\u017car lub wyrzut', effect: 'Oparzenia, po\u017car', defaultS: 3, defaultP: 2, actions: ['Czujnik przep\u0142ywu ch\u0142odziwa z blokad\u0105 wrzeciona', 'Alarm przy braku ch\u0142odziwa', 'Automatyczne zatrzymanie przy awarii ch\u0142odzenia', 'Kontrola filtra ch\u0142odziwa co tydzie\u0144'] },
+      { id: 'l29', element: 'Awaria czujnik\u00f3w krancowych (limit switches)', threat: 'Przekroczenie zakresu ruchu osi', effect: 'Kolizja mechaniczna, uszkodzenie maszyny', defaultS: 3, defaultP: 2, actions: ['Mechaniczne ograniczniki kra\u0144cowe jako backup', 'Redundantne czujniki kra\u0144cowe', 'Regularna kontrola czujnik\u00f3w wg harmonogramu PM', 'Alarm diagnostyczny w sterowniku CNC'] },
+      // === KONSERWACJA I SERWIS ===
+      { id: 'l30', element: 'Czyszczenie maszyny / usuwanie wi\u00f3r\u00f3w', threat: 'Skaleczenie od ostrych wi\u00f3r\u00f3w metalowych', effect: 'Rany ci\u0119te r\u0105k', defaultS: 2, defaultP: 4, actions: ['Haczyk do wi\u00f3r\u00f3w \u2014 zakaz usuwania r\u0119kami', 'R\u0119kawice antyprzeci\u0119ciowe EN 388 kat. 4', 'Usuwanie wi\u00f3r\u00f3w przy zatrzymanej maszynie', 'Spr\u0119\u017cone powietrze max 2 bar (kierunek od operatora)'] },
+      { id: 'l31', element: 'Wymiana oleju / p\u0142yn\u00f3w eksploatacyjnych', threat: 'Kontakt sk\u00f3rny z olejem maszynowym', effect: 'Dermatoza, zatrucie przy spo\u017cyciu', defaultS: 2, defaultP: 3, actions: ['R\u0119kawice EN 374', 'Okulary ochronne EN 166', 'Pojemnik na zu\u017cyty olej \u2014 segregacja odpad\u00f3w', 'SDS oleju maszynowego na stanowisku'] },
+      { id: 'l32', element: 'Regulacja / wymiana szcz\u0119k uchwytu', threat: 'Przygniecenie palc\u00f3w przez szcz\u0119ki', effect: 'Zmiażdżenie palców', defaultS: 3, defaultP: 3, actions: ['Wymiana przy zatrzymanym wrzecionie', 'LOTO przed wej\u015bciem w stref\u0119 uchwytu', 'Klucz uchwytu z samoistnym wypadaniem', 'Kontrola momentu dokr\u0119cenia po wymianie'] },
+      { id: 'l33', element: 'Serwis uk\u0142adu hydraulicznego', threat: 'Wtrysk oleju hydraulicznego pod ci\u015bnieniem', effect: 'Wtrysk oleju pod sk\u00f3r\u0119 \u2014 amputacja', defaultS: 4, defaultP: 1, actions: ['Depresuryzacja uk\u0142adu przed serwisem', 'R\u0119kawice odporne na ci\u015bnienie', 'Sprawdzenie szczelno\u015bci z\u0142\u0105czy przed uruchomieniem', 'Zakaz szukania nieszczelno\u015bci r\u0119k\u0105'] },
+      // === DEMONTAŻ ===
+      { id: 'l34', element: 'Demonta\u017c / z\u0142omowanie maszyny', threat: 'Upadek ci\u0119\u017ckich element\u00f3w przy demonta\u017cu', effect: 'Zgniecenie, \u015bmier\u0107', defaultS: 4, defaultP: 2, actions: ['Plan demonta\u017cu zatwierdzony przez in\u017cyniera', 'Od\u0142\u0105czenie wszystkich medi\u00f3w przed demonta\u017cem', 'Strefa wy\u0142\u0105czona dla os\u00f3b postronnych', 'Utylizacja p\u0142yn\u00f3w zgodnie z przepisami \u015brodowiskowymi'] },`;
+
+let c = fs.readFileSync('C:/Projects/riskpro/frontend/src/data/machines.ts', 'utf8');
+
+// Find the last threat of lathe-cnc (l13) and insert after it
+const insertAfter = "{ id: 'l13', element: 'Gor\u0105ce wi\u00f3ry / ch\u0142odziwo', threat: 'Po\u017car od zap\u0142onu opar\u00f3w ch\u0142odziwa', effect: 'Po\u017car maszyny, oparzenia', defaultS: 3, defaultP: 1, actions: ['Ga\u015bnica CO\u2082 przy maszynie', 'Czyszczenie wi\u00f3r\u00f3w co zmian\u0119', 'Zakaz \u0142atwopalnych p\u0142yn\u00f3w ch\u0142odz\u0105cych'] },";
+
+const idx = c.indexOf(insertAfter);
+if (idx === -1) {
+  // Try finding by id only
+  const idx2 = c.indexOf("id: 'l13'");
+  console.log('l13 found at:', idx2);
+  // Find end of l13 entry
+  const endIdx = c.indexOf('},', idx2) + 2;
+  c = c.slice(0, endIdx) + newThreats + c.slice(endIdx);
+} else {
+  c = c.slice(0, idx + insertAfter.length) + newThreats + c.slice(idx + insertAfter.length);
+}
+
+fs.writeFileSync('C:/Projects/riskpro/frontend/src/data/machines.ts', c, 'utf8');
+console.log('done, l14 present:', c.includes("id: 'l14'"), 'l34 present:', c.includes("id: 'l34'"));

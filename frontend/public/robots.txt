@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /analysis
+Disallow: /admin
+Disallow: /settings
+Disallow: /auth
+
+Sitemap: https://riskanalytix.eu/sitemap.xml
