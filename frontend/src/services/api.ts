@@ -2,15 +2,29 @@ import axios from 'axios'
 
 /**
  * Adres URL backendu.
- * 1. Najpierw sprawdza zmienną środowiskową VITE_API_URL.
- * 2. Jeśli jej nie ma, a jesteśmy na Vercelu (produkcja), używa relatywnej ścieżki /api.
- * 3. Tylko w trybie deweloperskim używa localhost:3001.
+ * Dynamicznie sprawdza, czy aplikacja działa na localhost, czy na produkcji.
  */
-const BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? '/api' : 'http://localhost:3001/api')
+const isLocalhost = Boolean(
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '[::1]' ||
+  window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
+);
+
+// Na produkcji ZAWSZE używamy relatywnej ścieżki /api (obsługiwanej przez vercel.json)
+// Na localhost uderzamy bezpośrednio w port 3001
+const BASE_URL = isLocalhost 
+  ? 'http://localhost:3001/api' 
+  : '/api';
+
+console.log('🚀 API Configuration:', {
+  hostname: window.location.hostname,
+  isLocalhost,
+  baseURL: BASE_URL
+});
 
 /**
  * Funkcja oczyszczająca dane przed wysyłką do JSON.
+ * Zapobiega błędom parsowania przy znakach specjalnych.
  */
 const sanitizeForJson = (obj: unknown): unknown => {
   if (typeof obj === 'string') {
@@ -28,35 +42,31 @@ const sanitizeForJson = (obj: unknown): unknown => {
 const api = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true
 })
 
-const getAccessToken = (): string | null => {
-  try {
-    const raw = localStorage.getItem('riskanalytix-auth')
-    if (!raw) return null
-    return JSON.parse(raw)?.state?.accessToken ?? null
-  } catch { return null }
-}
-
-const getRefreshToken = (): string | null => {
-  try {
-    const raw = localStorage.getItem('riskanalytix-auth')
-    if (!raw) return null
-    return JSON.parse(raw)?.state?.refreshToken ?? null
-  } catch { return null }
-}
-
+// Interceptor żądań
 api.interceptors.request.use((config) => {
-  const token = getAccessToken()
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  // Pobieranie tokena z localStorage (zakładając, że tak go przechowujesz)
+  const authStorage = localStorage.getItem('riskanalytix-auth');
+  if (authStorage) {
+    try {
+      const { state } = JSON.parse(authStorage);
+      if (state?.accessToken) {
+        config.headers.Authorization = `Bearer ${state.accessToken}`;
+      }
+    } catch (e) {
+      console.error('Błąd odczytu tokena:', e);
+    }
   }
+
   if (config.data && typeof config.data === 'object') {
     config.data = sanitizeForJson(config.data)
   }
   return config
 })
 
+// Interceptor odpowiedzi (obsługa wygasłego tokena)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -65,31 +75,27 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
       try {
-        const refreshToken = getRefreshToken()
-        if (!refreshToken) throw new Error('Brak refresh tokena')
+        const authStorage = localStorage.getItem('riskanalytix-auth');
+        if (!authStorage) throw new Error('Brak danych logowania');
+        
+        const parsed = JSON.parse(authStorage);
+        const refreshToken = parsed.state?.refreshToken;
+        
+        if (!refreshToken) throw new Error('Brak refresh tokena');
 
         const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken })
         
-        const raw = localStorage.getItem('riskanalytix-auth')
-        if (raw) {
-          const parsed = JSON.parse(raw)
-          parsed.state.accessToken = data.accessToken
-          parsed.state.refreshToken = data.refreshToken
-          localStorage.setItem('riskanalytix-auth', JSON.stringify(parsed))
-        }
+        // Aktualizacja tokenów w storage
+        parsed.state.accessToken = data.accessToken
+        parsed.state.refreshToken = data.refreshToken
+        localStorage.setItem('riskanalytix-auth', JSON.stringify(parsed))
 
         original.headers.Authorization = `Bearer ${data.accessToken}`
         return api(original)
       } catch (refreshError) {
-        const raw = localStorage.getItem('riskanalytix-auth')
-        if (raw) {
-          const parsed = JSON.parse(raw)
-          parsed.state.accessToken = null
-          parsed.state.refreshToken = null
-          parsed.state.user = null
-          localStorage.setItem('riskanalytix-auth', JSON.stringify(parsed))
-        }
-        window.location.href = '/auth/login'
+        // Jeśli odświeżanie zawiedzie, wyloguj użytkownika
+        localStorage.removeItem('riskanalytix-auth');
+        window.location.href = '/login';
         return Promise.reject(refreshError)
       }
     }
