@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "src/index.ts"
+    },
+    {
+      "source": "/auth/(.*)",
+      "destination": "src/index.ts"
+    },
+    {
+      "source": "/analysis/(.*)",
+      "destination": "src/index.ts"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
