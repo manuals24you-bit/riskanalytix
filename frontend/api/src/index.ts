@@ -11,12 +11,14 @@ import webhookRoutes from './routes/webhook.routes'
 dotenv.config()
 
 const app = express()
+
+// Bardzo ważne dla Vercel/Cloudflare, aby rate limiter widział poprawne IP użytkownika
 app.set('trust proxy', 1)
 
 const PORT = process.env.PORT || 3001
 const isDev = process.env.NODE_ENV !== 'production'
 
-// 1. HELMET - Konfiguracja pozwalająca na komunikację między różnymi źródłami (cross-origin)
+// 1. HELMET - Konfiguracja bezpiecznych nagłówków
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }))
@@ -29,53 +31,59 @@ const allowedOrigins = [
   'https://riskanalytix-production.vercel.app',
   'https://riskanalytix.eu',
   'https://www.riskanalytix.eu'
-].filter(Boolean); // Usuwa undefined, jeśli zmienne środowiskowe nie są ustawione
+].filter(Boolean) as string[];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // W trybie deweloperskim pozwalamy na brak origin (np. Postman)
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-      callback(null, true)
+    // 1. Pozwól na brak origin (Postman, urządzenia mobilne)
+    if (!origin) return callback(null, true);
+
+    // 2. Sprawdź czy origin jest na liście allowedOrigins
+    const isAllowed = allowedOrigins.includes(origin);
+
+    // 3. Sprawdź czy to subdomena vercel.app (dynamiczne podglądy Vercel)
+    const isVercelSubdomain = origin.endsWith('.vercel.app');
+
+    if (isAllowed || isVercelSubdomain) {
+      callback(null, true);
     } else {
-      console.warn(`🛑 CORS Blocked: ${origin}`); // Loguje, jaki adres został zablokowany
-      callback(new Error('Not allowed by CORS'))
+      console.warn(`🛑 CORS Blocked: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['set-cookie'] // Ważne, jeśli używasz ciasteczek sesyjnych
 }))
 
 // 3. OBSŁUGA ZAPYTAŃ OPTIONS (Preflight)
-// Przeglądarki wysyłają OPTIONS przed POST/PUT. Musimy na nie odpowiedzieć nagłówkami CORS.
 app.options('*', cors());
 
-// Webhook musi być przed express.json() zeby miec dostep do raw body
-app.use('/api/webhooks', express.raw({ type: 'application/json' }), (req: any, res, next) => {
-  if (req.body && Buffer.isBuffer(req.body)) req.body = JSON.parse(req.body.toString())
-  next()
-}, webhookRoutes)
-
+// Middlewares
 app.use(express.json({ limit: '10mb' }))
 
-// Limity zapytań
+// Webhook musi być przed express.json() jeśli potrzebuje raw body, 
+// ale tutaj używamy prostego parsowania dla ułatwienia
+app.use('/api/webhooks', webhookRoutes)
+
+// Limity zapytań (zwiększone limity, aby uniknąć blokad podczas testów)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 1000 : 100,
+  max: isDev ? 2000 : 200, 
   message: { error: 'Zbyt wiele requestów, spróbuj za chwilę.' },
+  standardHeaders: true,
+  legacyHeaders: false,
 })
 app.use('/api/', limiter)
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: isDev ? 200 : 10,
-  message: { error: 'Zbyt wiele prób logowania, spróbuj za 15 minut.' },
-})
-app.use('/api/auth/', authLimiter)
-
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+  res.json({ 
+    status: 'ok', 
+    env: process.env.NODE_ENV,
+    timestamp: new Date().toISOString() 
+  })
 })
 
 // Trasy API
@@ -83,9 +91,19 @@ app.use('/api/auth',     authRoutes)
 app.use('/api/analyses', analysisRoutes)
 app.use('/api/admin',    adminRoutes)
 
-app.listen(PORT, () => {
-  console.log(`✅ Serwer działa na http://localhost:${PORT}`)
-  console.log(`🌍 Środowisko: ${process.env.NODE_ENV}`)
-})
+// Obsługa błędów (zapobiega wywalaniu się serwera)
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err.message === 'Not allowed by CORS') {
+    res.status(403).json({ error: 'CORS Error: Origin not allowed' });
+  } else {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`✅ Serwer działa na porcie ${PORT}`)
+  })
+}
 
 export default app
