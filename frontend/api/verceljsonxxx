@@ -10,14 +10,6 @@
     {
       "source": "/api/(.*)",
       "destination": "src/index.ts"
-    },
-    {
-      "source": "/auth/(.*)",
-      "destination": "src/index.ts"
-    },
-    {
-      "source": "/analysis/(.*)",
-      "destination": "src/index.ts"
     }
   ],
   "env": {
