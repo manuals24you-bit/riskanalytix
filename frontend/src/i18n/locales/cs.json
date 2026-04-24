@@ -281,17 +281,8 @@
     "designLevel": "🔧 Bezpečná konstrukce",
     "technicalLevel": "🛡️ Technická opatření",
     "orgLevel": "📋 OOPP",
-    "scenarioPlaceholder": "Kdy / situace / vzdálenost obsluhy...",
-    "scenarioShortPlaceholder": "Kdy / situace...",
-    "justificationSPlaceholder": "např. riziko amputace při kontaktu s vřetenem",
-    "justificationPPlaceholder": "např. každodenní kontakt obsluhy s nebezpečnou zónou",
-    "actionNormPlaceholder": "např. EN ISO 10218-1, podnikový postup...",
-    "plrP1Placeholder": "např. zóna s nouzovým východem, reakční doba > 4s",
-    "plrP2Placeholder": "např. uzavřená zóna, bez zvukového varování",
-    "preparedByPlaceholder": "např. Jan Novák",
-    "preparedRolePlaceholder": "např. Bezpečnostní inženýr, Specialista BOZP",
-    "approvedByPlaceholder": "např. Anna Nováková",
-    "approvedRolePlaceholder": "např. Vedoucí výroby, Technický ředitel"
+    "hierarchy1full": "Úroveň 1 — Eliminace / Bezpečný návrh",
+    "hierarchy3full": "Úroveň 3 — Organizační / Informace a školení"
   },
   "risk": {
     "high": "VYSOKÉ",

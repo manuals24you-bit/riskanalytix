@@ -1,0 +1,12 @@
+PS C:\projects\riskpro\frontend> Get-Content C:\projects\riskpro\frontend\src\pages\LandingPage.tsx | Select-Object -Skip 368 -First 10
+              ))}
+            </div>
+            <style>{`@keyframes scroll-left { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }`}</style>
+          </section>
+          <section style={{ padding: '24px 0' }}>
+            <div style={{ marginBottom: '36px' }}>
+              <div style={{ fontSize: '9px', color: '#E8A838', letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: '8px', fontFamily: 'Lato, sans-serif' }}>{t.pricingLabel}</div>
+              <h2 style={{ fontSize: 'clamp(20px, 2.4vw, 30px)', fontWeight: 400, margin: '0 0 8px', color: '#E0DDD8' }}>
+                {t.pricingTitle1} <span style={{ color: '#E8A838', fontStyle: 'italic' }}>{t.pricingTitle2}</span>
+              </h2>
+PS C:\projects\riskpro\frontend>

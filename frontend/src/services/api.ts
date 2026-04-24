@@ -1,8 +1,17 @@
 import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+/**
+ * Adres URL backendu.
+ * 1. Najpierw sprawdza zmienną środowiskową VITE_API_URL.
+ * 2. Jeśli jej nie ma, a jesteśmy na Vercelu (produkcja), używa relatywnej ścieżki /api.
+ * 3. Tylko w trybie deweloperskim używa localhost:3001.
+ */
+const BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? '/api' : 'http://localhost:3001/api')
 
-// Usuwa znaki kontrolne które psują JSON (zachowuje normalne UTF-8)
+/**
+ * Funkcja oczyszczająca dane przed wysyłką do JSON.
+ */
 const sanitizeForJson = (obj: unknown): unknown => {
   if (typeof obj === 'string') {
     return obj.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
@@ -39,7 +48,9 @@ const getRefreshToken = (): string | null => {
 
 api.interceptors.request.use((config) => {
   const token = getAccessToken()
-  if (token) config.headers.Authorization = `Bearer ${token}`
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
   if (config.data && typeof config.data === 'object') {
     config.data = sanitizeForJson(config.data)
   }
@@ -50,31 +61,36 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config
+    
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
       try {
         const refreshToken = getRefreshToken()
         if (!refreshToken) throw new Error('Brak refresh tokena')
+
         const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken })
+        
         const raw = localStorage.getItem('riskanalytix-auth')
         if (raw) {
           const parsed = JSON.parse(raw)
-          parsed.state.accessToken  = data.accessToken
+          parsed.state.accessToken = data.accessToken
           parsed.state.refreshToken = data.refreshToken
           localStorage.setItem('riskanalytix-auth', JSON.stringify(parsed))
         }
+
         original.headers.Authorization = `Bearer ${data.accessToken}`
         return api(original)
-      } catch {
+      } catch (refreshError) {
         const raw = localStorage.getItem('riskanalytix-auth')
         if (raw) {
           const parsed = JSON.parse(raw)
-          parsed.state.accessToken  = null
+          parsed.state.accessToken = null
           parsed.state.refreshToken = null
-          parsed.state.user         = null
+          parsed.state.user = null
           localStorage.setItem('riskanalytix-auth', JSON.stringify(parsed))
         }
-        window.location.href = '/auth'
+        window.location.href = '/auth/login'
+        return Promise.reject(refreshError)
       }
     }
     return Promise.reject(error)

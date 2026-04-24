@@ -281,17 +281,8 @@
     "designLevel": "🔧 Inherently safe design",
     "technicalLevel": "🛡️ Technical measures",
     "orgLevel": "📋 Organisational / PPE",
-    "scenarioPlaceholder": "When / situation / operator distance...",
-    "scenarioShortPlaceholder": "When / situation...",
-    "justificationSPlaceholder": "e.g. risk of amputation on contact with spindle",
-    "justificationPPlaceholder": "e.g. daily operator contact with hazard zone",
-    "actionNormPlaceholder": "e.g. EN ISO 10218-1, company procedure...",
-    "plrP1Placeholder": "e.g. zone with emergency exit, reaction time > 4s",
-    "plrP2Placeholder": "e.g. enclosed zone, no audible warning",
-    "preparedByPlaceholder": "e.g. John Smith",
-    "preparedRolePlaceholder": "e.g. Safety Engineer, HSE Specialist",
-    "approvedByPlaceholder": "e.g. Anna Brown",
-    "approvedRolePlaceholder": "e.g. Production Manager, Technical Director"
+    "hierarchy1full": "Level 1 — Elimination / Safe design",
+    "hierarchy3full": "Level 3 — Organizational / Information and training"
   },
   "risk": {
     "high": "HIGH",

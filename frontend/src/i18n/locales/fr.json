@@ -281,17 +281,8 @@
     "designLevel": "🔧 Conception sûre",
     "technicalLevel": "🛡️ Mesures techniques",
     "orgLevel": "📋 EPI",
-    "scenarioPlaceholder": "Quand / situation / distance de l'opérateur...",
-    "scenarioShortPlaceholder": "Quand / situation...",
-    "justificationSPlaceholder": "ex. risque d'amputation au contact de la broche",
-    "justificationPPlaceholder": "ex. contact quotidien de l'opérateur avec la zone de danger",
-    "actionNormPlaceholder": "ex. EN ISO 10218-1, procédure d'entreprise...",
-    "plrP1Placeholder": "ex. zone avec sortie de secours, temps de réaction > 4s",
-    "plrP2Placeholder": "ex. zone fermée, pas d'avertissement sonore",
-    "preparedByPlaceholder": "ex. Jean Dupont",
-    "preparedRolePlaceholder": "ex. Ingénieur sécurité, Spécialiste HSE",
-    "approvedByPlaceholder": "ex. Marie Martin",
-    "approvedRolePlaceholder": "ex. Responsable production, Directeur technique"
+    "hierarchy1full": "Niveau 1 — Élimination / Conception sûre",
+    "hierarchy3full": "Niveau 3 — Organisationnelles / Information et formations"
   },
   "risk": {
     "high": "ÉLEVÉ",

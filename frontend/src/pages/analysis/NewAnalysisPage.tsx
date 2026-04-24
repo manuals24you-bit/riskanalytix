@@ -13,6 +13,7 @@ import { translateRiskEntry, getMachineTranslation } from '../../i18n/machinesI1
 import { SampleRiskReportButton, SampleCEButton } from './SamplePDFButtons'
 import { validateAnalysis } from '../../utils/analysisValidation'
 import ValidationPanel from '../../components/ValidationPanel'
+import { InlineTip } from '../../components/TipButton'
 
 
 interface AnalysisForm {
@@ -507,7 +508,7 @@ export default function NewAnalysisPage() {
         {/* STEP 2 */}
         {step === 2 && (
           <div>
-            <h2 style={{ color: '#F0EDE8', fontFamily: 'Georgia, serif', fontSize: '24px', marginBottom: '6px' }}>{t('analysis.step2')}<HelpLink section="step2" title="Instrukcja: Dane maszyny i granice" /></h2>
+            <h2 style={{ color: '#F0EDE8', fontFamily: 'Georgia, serif', fontSize: '24px', marginBottom: '6px' }}>{t('analysis.step2')}<HelpLink section="step2" title="Instrukcja: Dane maszyny i granice" /><InlineTip tipId="machine-limits" /></h2>
             <p style={{ color: '#8a99b0', fontSize: '13px', marginBottom: '28px' }}>{t('analysis.step2Desc')}</p>
 
             <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '10px', padding: '22px', marginBottom: '20px' }}>
@@ -556,7 +557,7 @@ export default function NewAnalysisPage() {
             <div style={{ marginBottom: '28px' }}>
               <div style={{ fontSize: '13px', color: '#E8A838', fontWeight: 600, marginBottom: '4px', fontFamily: 'Georgia, serif' }}>
                 {t('analysis.machineBoundaries')}
-                <HelpLink section="step2" title="Instrukcja: Granice maszyny ISO 12100 §5.3" />
+                <HelpLink section="step2" title="Instrukcja: Granice maszyny ISO 12100 §5.3" /><InlineTip tipId="machine-limits" />
               </div>
               <div style={{ fontSize: '11px', color: '#4a5a72', marginBottom: '16px', lineHeight: 1.6 }}>
                 {t('analysis.machineBoundariesDesc')}
@@ -608,7 +609,7 @@ export default function NewAnalysisPage() {
         {/* STEP 3 */}
         {step === 3 && (
           <div>
-            <h2 style={{ color: '#F0EDE8', fontFamily: 'Georgia, serif', fontSize: '24px', marginBottom: '6px' }}>{t('analysis.step3')}<HelpLink section="step3" title="Instrukcja: Analiza zagrożeń" /></h2>
+            <h2 style={{ color: '#F0EDE8', fontFamily: 'Georgia, serif', fontSize: '24px', marginBottom: '6px' }}>{t('analysis.step3')}<HelpLink section="step3" title="Instrukcja: Analiza zagrożeń" /><InlineTip tipId="hazard-analysis" /></h2>
             <p style={{ color: '#8a99b0', fontSize: '13px', marginBottom: '24px' }}>{t('analysis.step3Desc')}</p>
 
             {selectedMachine && selectedMachine.threats.length > 0 && (
@@ -694,7 +695,7 @@ const risk = getRiskLevel(tpl.defaultS, tpl.defaultP)
                   </span>
                   <span style={{ fontSize: '10px', color: '#F59E0B', background: 'rgba(245,158,11,.1)', border: '1px solid rgba(245,158,11,.3)', borderRadius: '4px', padding: '3px 8px' }}>
                     {t('analysis.neutralSP')}
-                    <HelpLink section="sp" title="Instrukcja: Parametry S i P" />
+                    <HelpLink section="sp" title="Instrukcja: Parametry S i P" /><InlineTip tipId="sp-params" />
                   </span>
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -894,7 +895,7 @@ const risk = getRiskLevel(tpl.defaultS, tpl.defaultP)
                                       {isOpen && (
                                         <div style={{ marginTop: '4px', background: '#0B0F1A', border: '1px solid #1e2d45', borderRadius: '4px', padding: '8px 10px' }}>
                                           <div style={{ fontSize: '9px', color: '#6B7280', marginBottom: '6px' }}>
-                                            {t('analysis.lifecycleSelectLabel')} <HelpLink section="lifecycle" title="Instrukcja: Cykl życia maszyny" />
+                                            {t('analysis.lifecycleSelectLabel')} <HelpLink section="lifecycle" title="Instrukcja: Cykl życia maszyny" /><InlineTip tipId="lifecycle" />
                                           </div>
                                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
                                             {LIFECYCLE_STAGES.map(ls => {
@@ -978,7 +979,7 @@ const risk = getRiskLevel(tpl.defaultS, tpl.defaultP)
                 <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '10px', overflow: 'hidden', marginBottom: '20px' }}>
                   <div style={{ padding: '10px 16px', borderBottom: '1px solid #1e2d45', background: 'rgba(52,199,123,.04)' }}>
                     <span style={{ fontSize: '10px', color: '#34C77B', textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 600 }}>
-                      {t('analysis.hierarchyTitle')} <HelpLink section="hierarchy" title="Instrukcja: Hierarchia środków ochronnych" />
+                      {t('analysis.hierarchyTitle')} <HelpLink section="hierarchy" title="Instrukcja: Hierarchia środków ochronnych" /><InlineTip tipId="protective-measures" />
                     </span>
                   </div>
 
@@ -1072,7 +1073,7 @@ const risk = getRiskLevel(tpl.defaultS, tpl.defaultP)
             {entries.length > 0 && (
               <div style={{ background: '#111827', border: '1px solid #1e2d45', borderRadius: '10px', overflow: 'hidden', marginBottom: '20px' }}>
                 <div style={{ padding: '10px 16px', borderBottom: '1px solid #1e2d45', fontSize: '10px', color: '#E8A838', textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 600 }}>
-                  {t('analysis.residualRisk')} <HelpLink section="residual" title="Instrukcja: Ryzyko resztkowe" />
+                  {t('analysis.residualRisk')} <HelpLink section="residual" title="Instrukcja: Ryzyko resztkowe" /><InlineTip tipId="residual-risk" />
                 </div>
                 <div style={{ padding: '8px 16px 12px', borderBottom: '1px solid #1e2d45', fontSize: '11px', color: '#6B7280', lineHeight: 1.6 }}>
                   {t('analysis.residualDesc')}

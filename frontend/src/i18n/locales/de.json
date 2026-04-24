@@ -281,17 +281,8 @@
     "designLevel": "🔧 Inhärent sichere Konstruktion",
     "technicalLevel": "🛡️ Technische Maßnahmen",
     "orgLevel": "📋 Organisatorisch / PSA",
-    "scenarioPlaceholder": "Wann / Situation / Abstand des Bedieners...",
-    "scenarioShortPlaceholder": "Wann / Situation...",
-    "justificationSPlaceholder": "z.B. Amputationsgefahr beim Kontakt mit der Spindel",
-    "justificationPPlaceholder": "z.B. täglicher Kontakt des Bedieners mit der Gefahrenzone",
-    "actionNormPlaceholder": "z.B. EN ISO 10218-1, Betriebsverfahren...",
-    "plrP1Placeholder": "z.B. Zone mit Notausgang, Reaktionszeit > 4s",
-    "plrP2Placeholder": "z.B. abgeschlossene Zone, keine akustische Warnung",
-    "preparedByPlaceholder": "z.B. Hans Müller",
-    "preparedRolePlaceholder": "z.B. Sicherheitsingenieur, HSE-Spezialist",
-    "approvedByPlaceholder": "z.B. Anna Schmidt",
-    "approvedRolePlaceholder": "z.B. Produktionsleiter, Technischer Direktor"
+    "hierarchy1full": "Ebene 1 — Beseitigung / Sicheres Design",
+    "hierarchy3full": "Ebene 3 — Organisatorisch / Information und Schulungen"
   },
   "risk": {
     "high": "HOCH",

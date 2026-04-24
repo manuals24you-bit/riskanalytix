@@ -281,17 +281,8 @@
     "designLevel": "🔧 Diseño seguro",
     "technicalLevel": "🛡️ Medidas técnicas",
     "orgLevel": "📋 EPI",
-    "scenarioPlaceholder": "Cuándo / situación / distancia del operador...",
-    "scenarioShortPlaceholder": "Cuándo / situación...",
-    "justificationSPlaceholder": "ej. riesgo de amputación al contacto con el husillo",
-    "justificationPPlaceholder": "ej. contacto diario del operador con la zona de peligro",
-    "actionNormPlaceholder": "ej. EN ISO 10218-1, procedimiento empresarial...",
-    "plrP1Placeholder": "ej. zona con salida de emergencia, tiempo de reacción > 4s",
-    "plrP2Placeholder": "ej. zona cerrada, sin advertencia sonora",
-    "preparedByPlaceholder": "ej. Juan García",
-    "preparedRolePlaceholder": "ej. Ingeniero de seguridad, Especialista HSE",
-    "approvedByPlaceholder": "ej. Ana Martínez",
-    "approvedRolePlaceholder": "ej. Jefe de producción, Director técnico"
+    "hierarchy1full": "Nivel 1 — Eliminación / Diseño seguro",
+    "hierarchy3full": "Nivel 3 — Organizativas / Información y formación"
   },
   "risk": {
     "high": "ALTO",

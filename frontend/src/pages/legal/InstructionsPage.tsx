@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getInstructionsT, type Lang } from '../../i18n/instructions'
+import TipButton from '../../components/TipButton'
 
 const S = {
   page: { minHeight: '100vh', background: '#0B0F1A', fontFamily: 'Lato, sans-serif', color: '#F0EDE8' } as React.CSSProperties,
@@ -739,6 +740,7 @@ export default function InstructionsPage() {
 
         </div>
       </div>
+      <TipButton />
     </div>
   )
 }

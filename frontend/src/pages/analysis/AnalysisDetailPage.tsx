@@ -32,6 +32,14 @@ export default function AnalysisDetailPage() {
     queryKey: ['analysis', id],
     queryFn: async () => {
       const { data } = await api.get(`/analyses/${id}`)
+      // Auto-wypełnij dane z zapisanej analizy (tylko gdy pola są puste)
+      setApproval(p => ({
+        ...p,
+        preparedBy: p.preparedBy || data.preparedBy || '',
+        preparedRole: p.preparedRole || data.preparedRole || '',
+        approvedBy: p.approvedBy || data.approvedBy || '',
+        approvedRole: p.approvedRole || data.approvedRole || '',
+      }))
       return data
     },
   })
@@ -119,32 +127,27 @@ export default function AnalysisDetailPage() {
                 ⬇ PDF {showApproval ? '▲' : '▼'}
               </button>
               {showApproval && (
-                <div style={{ position: 'absolute', right: 0, top: '36px', zIndex: 100, background: '#111827', border: '1px solid #1e2d45', borderRadius: '10px', padding: '16px', width: '360px', boxShadow: '0 8px 32px rgba(0,0,0,.5)' }}>
-                  <div style={{ fontSize: '10px', color: '#E8A838', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '12px', fontWeight: 600 }}>Opracował / Zatwierdził (opcjonalnie)</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-                    {[
-                      { key: 'preparedBy', label: '✏️ Opracował — imię i nazwisko', placeholder: analysis.analystName || 'Jan Kowalski' },
-                      { key: 'preparedRole', label: 'Stanowisko opracowującego', placeholder: 'Inżynier BHP' },
-                      { key: 'approvedBy', label: '✅ Zatwierdził — imię i nazwisko', placeholder: 'Anna Nowak' },
-                      { key: 'approvedRole', label: 'Stanowisko zatwierdzającego', placeholder: 'Kierownik produkcji' },
-                    ].map(f => (
-                      <div key={f.key}>
-                        <div style={{ fontSize: '9px', color: '#6B7280', marginBottom: '3px' }}>{f.label}</div>
-                        <input
-                          value={(approval as any)[f.key]}
-                          onChange={ev => setApproval(p => ({ ...p, [f.key]: ev.target.value }))}
-                          placeholder={f.placeholder}
-                          style={{ width: '100%', background: '#0B0F1A', border: '1px solid #1e2d45', borderRadius: '4px', color: '#F0EDE8', padding: '5px 8px', fontSize: '11px', boxSizing: 'border-box' }}
-                        />
-                      </div>
-                    ))}
-                    <div>
-                      <div style={{ fontSize: '9px', color: '#6B7280', marginBottom: '3px' }}>Data zatwierdzenia</div>
-                      <input type="date" value={approval.approvedDate}
-                        onChange={ev => setApproval(p => ({ ...p, approvedDate: ev.target.value }))}
-                        style={{ width: '100%', background: '#0B0F1A', border: '1px solid #1e2d45', borderRadius: '4px', color: '#F0EDE8', padding: '5px 8px', fontSize: '11px', boxSizing: 'border-box' }}
-                      />
+                <div style={{ position: 'absolute', right: 0, top: '36px', zIndex: 100, background: '#111827', border: '1px solid #1e2d45', borderRadius: '10px', padding: '16px', width: '320px', boxShadow: '0 8px 32px rgba(0,0,0,.5)' }}>
+                  {(approval.preparedBy || approval.approvedBy) ? (
+                    <div style={{ marginBottom: '12px', padding: '10px 12px', background: 'rgba(52,199,123,.07)', border: '1px solid rgba(52,199,123,.25)', borderRadius: '6px' }}>
+                      <div style={{ fontSize: '10px', color: '#34C77B', fontWeight: 700, marginBottom: '6px' }}>✓ Dane z analizy</div>
+                      {approval.preparedBy && <div style={{ fontSize: '11px', color: '#C0C8D8' }}>✏️ {approval.preparedBy}{approval.preparedRole ? ` — ${approval.preparedRole}` : ''}</div>}
+                      {approval.approvedBy && <div style={{ fontSize: '11px', color: '#C0C8D8', marginTop: '3px' }}>✅ {approval.approvedBy}{approval.approvedRole ? ` — ${approval.approvedRole}` : ''}</div>}
+                      <a href={`/analysis/${id}/edit`} style={{ display: 'inline-block', marginTop: '8px', fontSize: '10px', color: '#4a5a72', textDecoration: 'none' }}>✏️ Edytuj w kroku 4 →</a>
                     </div>
+                  ) : (
+                    <div style={{ marginBottom: '12px', padding: '10px 12px', background: 'rgba(232,64,64,.07)', border: '1px solid rgba(232,64,64,.25)', borderRadius: '6px' }}>
+                      <div style={{ fontSize: '11px', color: '#E84040', marginBottom: '4px' }}>⚠ Brak danych autora</div>
+                      <div style={{ fontSize: '10px', color: '#8a99b0' }}>Wpisz dane w kroku 4 analizy — pojawią się tutaj automatycznie.</div>
+                      <a href={`/analysis/${id}/edit`} style={{ display: 'inline-block', marginTop: '6px', fontSize: '10px', color: '#60A5FA', textDecoration: 'none' }}>✏️ Otwórz krok 4 →</a>
+                    </div>
+                  )}
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ fontSize: '9px', color: '#6B7280', marginBottom: '3px' }}>Data zatwierdzenia</div>
+                    <input type="date" value={approval.approvedDate}
+                      onChange={ev => setApproval(p => ({ ...p, approvedDate: ev.target.value }))}
+                      style={{ width: '100%', background: '#0B0F1A', border: '1px solid #1e2d45', borderRadius: '4px', color: '#F0EDE8', padding: '5px 8px', fontSize: '11px', boxSizing: 'border-box' }}
+                    />
                   </div>
                   <PDFDownloadButton analysis={analysis} approval={approval} />
                   {/* DOCX: tylko PRO */}

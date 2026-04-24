@@ -291,7 +291,9 @@
     "preparedByPlaceholder": "np. Jan Kowalski",
     "preparedRolePlaceholder": "np. Inżynier BHP, Specjalista ds. bezpieczeństwa",
     "approvedByPlaceholder": "np. Anna Nowak",
-    "approvedRolePlaceholder": "np. Kierownik produkcji, Dyrektor techniczny"
+    "approvedRolePlaceholder": "np. Kierownik produkcji, Dyrektor techniczny",
+    "hierarchy1full": "Poziom 1 — Eliminacja / Projekt bezpieczny",
+    "hierarchy3full": "Poziom 3 — Organizacyjne / Informacja i szkolenia"
   },
   "risk": {
     "high": "WYSOKIE",

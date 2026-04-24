@@ -281,17 +281,8 @@
     "designLevel": "🔧 Progettazione sicura",
     "technicalLevel": "🛡️ Misure tecniche",
     "orgLevel": "📋 DPI",
-    "scenarioPlaceholder": "Quando / situazione / distanza dell'operatore...",
-    "scenarioShortPlaceholder": "Quando / situazione...",
-    "justificationSPlaceholder": "es. rischio di amputazione a contatto con il mandrino",
-    "justificationPPlaceholder": "es. contatto quotidiano dell'operatore con la zona di pericolo",
-    "actionNormPlaceholder": "es. EN ISO 10218-1, procedura aziendale...",
-    "plrP1Placeholder": "es. zona con uscita di emergenza, tempo di reazione > 4s",
-    "plrP2Placeholder": "es. zona chiusa, nessun avviso acustico",
-    "preparedByPlaceholder": "es. Mario Rossi",
-    "preparedRolePlaceholder": "es. Ingegnere della sicurezza, Specialista HSE",
-    "approvedByPlaceholder": "es. Anna Bianchi",
-    "approvedRolePlaceholder": "es. Responsabile produzione, Direttore tecnico"
+    "hierarchy1full": "Livello 1 — Eliminazione / Progettazione sicura",
+    "hierarchy3full": "Livello 3 — Organizzative / Informazioni e formazione"
   },
   "risk": {
     "high": "ALTO",
